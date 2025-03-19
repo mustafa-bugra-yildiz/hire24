@@ -1,14 +1,27 @@
+# Configuration.
 ARG GO_VERSION=1
-FROM golang:${GO_VERSION}-bookworm as builder
 
-WORKDIR /usr/src/app
-COPY go.mod ./
-RUN go mod download && go mod verify
-COPY . .
-RUN go build -v -o /run-app .
+# Builder image.
+FROM golang:${GO_VERSION}-alpine AS builder
+WORKDIR /src
 
+  # Install dependencies (cached).
+  COPY go.mod ./
+  RUN go mod download && go mod verify
 
-FROM debian:bookworm
+  # Build the binary.
+  COPY . .
+  RUN go build -v -o h24 .
 
-COPY --from=builder /run-app /usr/local/bin/
-CMD ["run-app"]
+# Runtime image.
+FROM alpine
+WORKDIR /fly
+
+  # Static files
+  COPY templates /fly/templates
+
+  # Binary
+  COPY --from=builder /src/h24 .
+
+# Done.
+CMD ["./h24"]

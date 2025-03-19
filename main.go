@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var indexTmpl = template.Must(template.ParseFiles("index.html"))
+var indexTmpl = template.Must(template.ParseFiles("templates/index.html"))
 
 func main() {
 	log.Fatal(http.ListenAndServe(port(), routes()))
