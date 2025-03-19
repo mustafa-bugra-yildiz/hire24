@@ -2,13 +2,26 @@ package main
 
 import (
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 )
 
 var indexTmpl = template.Must(template.ParseFiles("index.html"))
 
 func main() {
-	http.ListenAndServe(":3000", routes())
+	log.Fatal(http.ListenAndServe(port(), routes()))
+}
+
+func port() string {
+	host := "0.0.0.0"
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	return host + ":" + port
 }
 
 func routes() *http.ServeMux {
